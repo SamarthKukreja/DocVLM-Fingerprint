@@ -29,8 +29,9 @@ The name `Fingerprint` refers to failure-mode and faithfulness fingerprints: com
 
 ## Quick Links For Reviewers
 
-- Project page: `docs/project_page.md`
+- Project page: `docs/index.html` for GitHub Pages; text summary: `docs/project_page.md`
 - Paper : `report/docvlm_fingerprint_paper.pdf`
+- Paper build notes: `report/README.md`
 - Metrics: `results/metrics.csv`
 - Bootstrap CIs: `results/metric_cis_by_perturbation.csv`
 - Manual audit worksheet: `docs/manual_audit.md`; summary helper writes `docs/manual_audit_summary.md` after review
@@ -106,9 +107,19 @@ Upload `kaggle/docvlm-fingerprint-kaggle-dataset.zip`, then import `kaggle/docvl
 
 The main reported run uses the generated dataset only. Three separate real-data checks are included under `results/external/` and remain separate from `results/metrics.csv`. ChartQA uses a 30-example `HuggingFaceM4/ChartQA` slice with three model entries and 90 clean chart-QA calls: `0.6000` exact-match accuracy for `qwen3_vl_8b`, `0.2000` for `internvl35_8b_hf`, and `0.5000` for `qwen3_vl_4b`. DocumentVQA uses a 30-example `HuggingFaceM4/DocumentVQA` validation slice with the same three model entries and 90 clean OCR-document calls: `0.6667` accuracy for `qwen3_vl_8b`, `0.6333` for `internvl35_8b_hf`, and `0.6333` for `qwen3_vl_4b`.
 
-CharXiv adds the most direct real-data perturbation check: `data/external/charxiv/` contains 20 real arXiv chart examples with the same four perturbations, and `results/external/charxiv/` contains Qwen-only outputs for `qwen3_vl_4b` and `qwen3_vl_8b`. Clean answer accuracy is `0.4000` for `qwen3_vl_4b` and `0.4500` for `qwen3_vl_8b`; JPEG compression drops both to `0.1000`, while blur/downscale reaches `0.1500` and `0.2500`. Treat ChartQA, DocumentVQA, and CharXiv as small external checks, not benchmark results.
+CharXiv adds the most direct real-data perturbation check: `data/external/charxiv/` contains curated metadata for 20 real arXiv chart examples with the same four perturbations, and `results/external/charxiv/` contains Qwen-only outputs for `qwen3_vl_4b` and `qwen3_vl_8b`. The CharXiv image folders are local-only and ignored by git. Clean answer accuracy is `0.4000` for `qwen3_vl_4b` and `0.4500` for `qwen3_vl_8b`; JPEG compression drops both to `0.1000`, while blur/downscale reaches `0.1500` and `0.2500`. Treat ChartQA, DocumentVQA, and CharXiv as small external checks, not benchmark results.
 
-Reproduce or rerun the clean external paths with the import/evaluation helpers in `src/import_chartqa_slice.py` and `src/evaluate_external_chartqa.py`. The CharXiv supplement includes attribution and `CC BY-SA 4.0` license fields in `data/external/charxiv/charxiv_selection.json`.
+Reproduce or rerun the clean external paths with the import/evaluation helpers in `src/import_chartqa_slice.py` and `src/evaluate_external_chartqa.py`. The CharXiv supplement includes source attribution fields in `data/external/charxiv/charxiv_selection.json`; regenerated CharXiv images should remain local unless redistribution permissions are reviewed.
+
+## Public Project Page
+
+A lightweight GitHub Pages version is available at `docs/index.html`. To publish it, open the repository settings on GitHub, enable Pages from the `main` branch and `/docs` folder, then use:
+
+```text
+https://samarthkukreja.github.io/DocVLM-Fingerprint/
+```
+
+The page uses only files under `docs/`, including copied result figures and first-party generated sample images. External dataset images are not included.
 
 ## Dashboard
 

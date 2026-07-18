@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+        content="DocVLM-Fingerprint is a reproducible framework for document-centric VLM robustness and claim-faithfulness evaluation.">
+    <title>DocVLM-Fingerprint</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header class="hero">
+        <nav class="nav" aria-label="Primary navigation">
+            <a class="brand" href="#top">DocVLM-Fingerprint</a>
+            <div class="nav-links">
+                <a href="#results">Results</a>
+                <a href="#workflow">Workflow</a>
+                <a href="#artifacts">Artifacts</a>
+                <a href="https://github.com/SamarthKukreja/DocVLM-Fingerprint">GitHub</a>
+            </div>
+        </nav>
+        <div id="top" class="hero-copy">
+            <p class="eyebrow">Document VQA reliability under controlled visual stress</p>
+            <h1>DocVLM-Fingerprint</h1>
+            <p class="lede">A reproducible evaluation workflow for testing how vision-language models answer chart,
+                OCR-document, and scientific-figure questions under perturbations, while tracking whether the supporting
+                visual claim is grounded.</p>
+            <div class="hero-actions">
+                <a class="button primary" href="https://github.com/SamarthKukreja/DocVLM-Fingerprint">View
+                    Repository</a>
+                <a class="button secondary"
+                    href="https://github.com/SamarthKukreja/DocVLM-Fingerprint/blob/main/docs/project_page.md">Read Text
+                    Summary</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="band stats" aria-label="Project summary statistics">
+            <div class="stat"><span>120</span>
+                <p>generated document examples</p>
+            </div>
+            <div class="stat"><span>4</span>
+                <p>visual perturbation families</p>
+            </div>
+            <div class="stat"><span>3</span>
+                <p>open model entries</p>
+            </div>
+            <div class="stat"><span>1800</span>
+                <p>checked-in VLM calls</p>
+            </div>
+        </section>
+
+        <section class="section two-column">
+            <div>
+                <p class="eyebrow dark">What it tests</p>
+                <h2>Answer accuracy is only half the story.</h2>
+                <p>DocVLM-Fingerprint pairs short-answer correctness with claim-support scoring. The main run uses a
+                    two-line <code>Answer:</code> and <code>Evidence:</code> protocol so the final answer and the
+                    supporting visual claim can be inspected separately.</p>
+                <p>The project is scoped as a controlled systems and evaluation case study, not a broad benchmark,
+                    leaderboard, or new faithfulness metric.</p>
+            </div>
+            <figure class="image-panel">
+                <img src="assets/sample_clean_chart.png" alt="Generated clean chart example used by the evaluation">
+                <figcaption>First-party generated chart example from the controlled dataset.</figcaption>
+            </figure>
+        </section>
+
+        <section id="results" class="section results-band">
+            <div class="section-heading">
+                <p class="eyebrow dark">Main finding</p>
+                <h2>Clean inputs are strong; compression and blur expose sharp failure modes.</h2>
+                <p>The checked-in Kaggle run evaluates <code>qwen3_vl_8b</code>, <code>internvl35_8b_hf</code>, and
+                    <code>qwen3_vl_4b</code> over the full generated dataset. JPEG compression and blur/downscale
+                    produce the largest drops, while distractor text is comparatively milder.
+                </p>
+            </div>
+            <div class="figure-grid">
+                <figure>
+                    <img src="assets/accuracy_heatmap.png"
+                        alt="Answer accuracy heatmap by model, domain, and perturbation">
+                    <figcaption>Answer accuracy by model, domain, and perturbation.</figcaption>
+                </figure>
+                <figure>
+                    <img src="assets/perturbation_impact.png"
+                        alt="Perturbation impact chart showing accuracy drop from clean inputs">
+                    <figcaption>Average answer-accuracy drop from clean inputs.</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section id="workflow" class="section">
+            <div class="section-heading narrow">
+                <p class="eyebrow dark">Workflow</p>
+                <h2>A small end-to-end evaluation harness.</h2>
+            </div>
+            <div class="steps">
+                <div><span>1</span>
+                    <p>Generate deterministic chart, OCR-document, and scientific-figure examples.</p>
+                </div>
+                <div><span>2</span>
+                    <p>Create blur/downscale, crop/removal, JPEG compression, and distractor-text variants.</p>
+                </div>
+                <div><span>3</span>
+                    <p>Evaluate configured VLMs through a shared model-client interface.</p>
+                </div>
+                <div><span>4</span>
+                    <p>Split outputs into answer and evidence claims, then score support.</p>
+                </div>
+                <div><span>5</span>
+                    <p>Write JSONL, metrics, bootstrap confidence intervals, figures, ablations, and audit sheets.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section visual-strip" aria-label="Example perturbations">
+            <figure>
+                <img src="assets/sample_clean_chart.png" alt="Clean chart">
+                <figcaption>Clean</figcaption>
+            </figure>
+            <figure>
+                <img src="assets/sample_blur_chart.png" alt="Blurred and downscaled chart">
+                <figcaption>Blur/downscale</figcaption>
+            </figure>
+            <figure>
+                <img src="assets/sample_jpeg_chart.png" alt="JPEG-compressed chart">
+                <figcaption>JPEG compression</figcaption>
+            </figure>
+            <figure>
+                <img src="assets/sample_distractor_chart.png" alt="Chart with distractor text overlay">
+                <figcaption>Distractor text</figcaption>
+            </figure>
+        </section>
+
+        <section class="section two-column external">
+            <div>
+                <p class="eyebrow dark">External checks</p>
+                <h2>Real-data slices stay separate from the main generated run.</h2>
+                <p>Small ChartQA and DocumentVQA clean-only slices are included as sanity checks. A CharXiv real-chart
+                    supplement applies the same four perturbations to 20 real arXiv chart examples for the Qwen 4B/8B
+                    scale comparison.</p>
+                <p>These checks improve external validity, but they are intentionally reported outside the main
+                    generated-dataset metrics.</p>
+            </div>
+            <figure class="image-panel wide">
+                <img src="assets/faithfulness_heatmap.png"
+                    alt="Claim support heatmap by model, domain, and perturbation">
+                <figcaption>Claim-support heatmap from the generated-dataset run.</figcaption>
+            </figure>
+        </section>
+
+        <section class="section limitations">
+            <div class="section-heading narrow">
+                <p class="eyebrow dark">Limitations</p>
+                <h2>Useful as a reproducible diagnostic, not a final benchmark.</h2>
+                <p>The main dataset is synthetic and small. The full run has three model entries but only two
+                    independent model families. The binary scorer is transparent and auditable, but simple. External
+                    ChartQA, DocumentVQA, and CharXiv checks are small and should not be merged into a leaderboard
+                    claim.</p>
+            </div>
+        </section>
+
+        <section id="artifacts" class="section artifact-band">
+            <div class="section-heading narrow">
+                <p class="eyebrow dark">Artifacts</p>
+                <h2>Everything needed to inspect or rerun the study.</h2>
+            </div>
+            <div class="artifact-list">
+                <a href="https://github.com/SamarthKukreja/DocVLM-Fingerprint/blob/main/results/metrics.csv">Metrics
+                    CSV</a>
+                <a
+                    href="https://github.com/SamarthKukreja/DocVLM-Fingerprint/blob/main/results/metric_cis_by_perturbation.csv">Bootstrap
+                    CIs</a>
+                <a href="https://github.com/SamarthKukreja/DocVLM-Fingerprint/blob/main/docs/manual_audit.md">Manual
+                    audit worksheet</a>
+                <a
+                    href="https://github.com/SamarthKukreja/DocVLM-Fingerprint/blob/main/docs/related_work_and_differentiation.md">Related
+                    work notes</a>
+                <a
+                    href="https://github.com/SamarthKukreja/DocVLM-Fingerprint/blob/main/report/docvlm_fingerprint_paper.pdf">Paper
+                    source</a>
+                <a href="https://github.com/SamarthKukreja/DocVLM-Fingerprint/tree/main/kaggle">Kaggle notebook</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Built by Samarth Kukreja. MIT licensed code. External dataset images are not redistributed unless licensing
+            is reviewed.</p>
+    </footer>
+</body>
+
+</html>

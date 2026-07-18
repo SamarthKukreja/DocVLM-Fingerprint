@@ -1,5 +1,7 @@
 # DocVLM-Fingerprint Project Page
 
+HTML version: `docs/index.html` for GitHub Pages.
+
 ## One-Line Summary
 
 DocVLM-Fingerprint is a reproducible evaluation workflow for testing how document-centric vision-language models behave under visual perturbations and claim-level faithfulness scoring.
@@ -14,9 +16,9 @@ Vision-language models can look reliable on clean document images but fail sharp
 - Four perturbation families for every example: blur/downscale, crop/removal, JPEG compression, and distractor text.
 - A plug-in model interface for local or API-backed VLM clients, with a custom-model config example for rerunning the pipeline on another model.
 - Claim extraction and binary evidence scoring with cacheable, auditable outputs.
-- Metrics, bootstrap confidence intervals, an audit-ready worksheet, descriptive ablation tables, heatmaps, failure examples, a Streamlit inspection dashboard, and a LaTeX report.
+- Metrics, bootstrap confidence intervals, an audit-ready worksheet, descriptive ablation tables, heatmaps, failure examples, a Streamlit inspection dashboard, and a pdf report.
 - A Kaggle notebook for running open VLMs on GPU and exporting reproducible result artifacts.
-- A small CharXiv real-chart perturbation supplement that stays separate from the main generated-dataset metrics.
+- A small CharXiv real-chart perturbation supplement with local-only images that stays separate from the main generated-dataset metrics.
 
 ## Demonstration Run
 
@@ -38,7 +40,7 @@ The main finding is intentionally narrow: the evaluated models perform strongly 
 - `results/external/chartqa/`: completed clean-only ChartQA sanity-check outputs
 - `results/external/documentvqa/`: completed clean-only DocumentVQA sanity-check outputs
 - `data/external/charxiv/` and `results/external/charxiv/`: curated real-chart perturbation supplement and Qwen-only outputs
-- `report/paper.tex`: concise paper-style report
+- `report/docvlm_fingerprint_paper.pdf`: concise paper-style report
 - `dashboard/app.py`: local inspection UI
 
 ## Engineering Signal
@@ -48,5 +50,3 @@ The project emphasizes maintainable ML evaluation infrastructure: deterministic 
 ## Limitations
 
 The main dataset is synthetic and small, the checked-in full run includes three model entries but only two independent model families, and the binary scorer is intentionally simple. These choices keep the project reproducible and auditable, but they limit broad claims. Bootstrap intervals are included as descriptive summaries. The ChartQA, DocumentVQA, and CharXiv runs are external checks rather than benchmark results, and CharXiv is Qwen-only. The 30-row manual-audit worksheet is prepared for review after a fresh run. Strong future extensions would add independent multi-annotator review, larger public real-world document slices, and more independent open-model families.
-
-
