@@ -1,0 +1,8 @@
+# Placeholder evaluation config for the DocVLM-Fingerprint MVP.
+dataset:
+  annotations_path: data/annotations.jsonl
+  samples_dir: data/samples
+  perturbed_dir: data/perturbed
+
+results:
+  output_dir: results

@@ -1,0 +1,10 @@
+# Optional dependencies for running open-source VLM case studies on Kaggle GPU notebooks.
+# Keep Kaggle's managed torch/protobuf/pillow stack intact. Install Transformers from source
+# without dependencies in the notebook, then install only the missing VLM extras.
+git+https://github.com/huggingface/transformers
+safetensors>=0.8.0
+accelerate
+qwen-vl-utils
+sentencepiece
+timm
+einops

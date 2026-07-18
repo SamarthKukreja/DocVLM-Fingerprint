@@ -1,0 +1,2 @@
+model,domain,perturbation,total_answers,correct_answers,answer_accuracy,total_claims,supported_claims,unsupported_claims,claim_faithfulness,hallucination_rate,perturbation_drop
+qwen3_vl_8b,ocr_doc,external_clean,30,20,0.6667,42,28,14,0.6667,0.3333,0.0000

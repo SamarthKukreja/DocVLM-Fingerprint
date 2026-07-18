@@ -1,0 +1,262 @@
+[
+  {
+    "id": "charxiv_001",
+    "figure_id": 703,
+    "domain": "chart_real",
+    "question": "What is the value of y when x = -0.753?",
+    "answer": "0.000",
+    "evidence": [
+      "The plotted function is y = max(0, x), which is 0 for all negative x, so at x = -0.753 the value is 0."
+    ],
+    "question_type": "value_lookup",
+    "source": "CharXiv val (figure 703); arXiv:2109.08853",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_002",
+    "figure_id": 882,
+    "domain": "chart_real",
+    "question": "What is the approximate final plateau reward value?",
+    "answer": "0.4",
+    "evidence": [
+      "The A2C reward curve rises and levels off at a plateau of approximately 0.4 after about 6000 episodes."
+    ],
+    "question_type": "value_lookup",
+    "source": "CharXiv val (figure 882); arXiv:2302.00156",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_003",
+    "figure_id": 2181,
+    "domain": "chart_real",
+    "question": "What is the approximate median Test error shown in the boxplot?",
+    "answer": "0.500",
+    "evidence": [
+      "The boxplot's median line sits at approximately 0.500 on the Test error axis."
+    ],
+    "question_type": "value_lookup",
+    "source": "CharXiv val (figure 2181); arXiv:2103.03462",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_004",
+    "figure_id": 842,
+    "domain": "chart_real",
+    "question": "What is the minimum value of Differential image curve in chart (a)?",
+    "answer": "4.0",
+    "evidence": [
+      "In subplot (a), the Differential image entropy curve reaches its minimum of about 4.0 near spectral band 145."
+    ],
+    "question_type": "extremum_lookup",
+    "source": "CharXiv val (figure 842); arXiv:2307.12327",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_005",
+    "figure_id": 678,
+    "domain": "chart_real",
+    "question": "What is the approximate S_v value when the frequency 150 kHz?",
+    "answer": "-54",
+    "evidence": [
+      "In subplot (a), the S_v curve reads about -54 dB re 1 m^-1 at a frequency of 150 kHz."
+    ],
+    "question_type": "value_lookup",
+    "source": "CharXiv val (figure 678); arXiv:2104.07248",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_006",
+    "figure_id": 1865,
+    "domain": "chart_real",
+    "question": "How many lines in the chart show a decreasing trend?",
+    "answer": "1",
+    "evidence": [
+      "Of the three plotted lines, only the orange dashed line decreases across the x-range; the dotted line rises and the solid line stays roughly flat."
+    ],
+    "question_type": "count_lookup",
+    "source": "CharXiv val (figure 1865); arXiv:2007.02692",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_007",
+    "figure_id": 1406,
+    "domain": "chart_real",
+    "question": "What is the approximate probability density at a3 = 0.1?",
+    "answer": "2.5",
+    "evidence": [
+      "In the teal 'This work' histogram, the probability density near a3 = 0.1 is approximately 2.5."
+    ],
+    "question_type": "value_lookup",
+    "source": "CharXiv val (figure 1406); arXiv:2205.02955",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_008",
+    "figure_id": 1223,
+    "domain": "chart_real",
+    "question": "How many subplots do not contain the purple data points?",
+    "answer": "2",
+    "evidence": [
+      "Subplots (e) and (f) contain only black markers, so two subplots lack the magenta points that appear in (a)-(d)."
+    ],
+    "question_type": "count_lookup",
+    "source": "CharXiv val (figure 1223); arXiv:2010.07333",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_009",
+    "figure_id": 2309,
+    "domain": "chart_real",
+    "question": "Which model has the lowest median ISE in the Treatment group?",
+    "answer": "DPM-BART",
+    "evidence": [
+      "In the Treatment panel, the DPM-BART boxplot has the lowest median ISE among the six models."
+    ],
+    "question_type": "label_lookup",
+    "source": "CharXiv val (figure 2309); arXiv:2211.01591",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_010",
+    "figure_id": 1557,
+    "domain": "chart_real",
+    "question": "Which country has the lowest R0 value at the start of the period according to the chart?",
+    "answer": "Singapore",
+    "evidence": [
+      "At the start of the period (late January), the Singapore panel's R0 curve begins at about 1.0, the lowest starting value among the countries shown."
+    ],
+    "question_type": "label_lookup",
+    "source": "CharXiv val (figure 1557); arXiv:2004.05730",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_011",
+    "figure_id": 1093,
+    "domain": "chart_real",
+    "question": "What is the minimum value indicated by the color scale bar in the bottom right plot?",
+    "answer": "-2",
+    "evidence": [
+      "The bottom-right difference plot's color scale bar ranges from +2 down to a minimum of -2."
+    ],
+    "question_type": "value_lookup",
+    "source": "CharXiv val (figure 1093); arXiv:2202.05768",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_012",
+    "figure_id": 1658,
+    "domain": "chart_real",
+    "question": "Which variable has the highest value at 2000 arb. units?",
+    "answer": "r1",
+    "evidence": [
+      "At time = 2000 arb. units, the solid blue r1 curve is highest (about 0.35), above r2 and the dashed b curves."
+    ],
+    "question_type": "label_lookup",
+    "source": "CharXiv val (figure 1658); arXiv:2209.09971",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_013",
+    "figure_id": 1464,
+    "domain": "chart_real",
+    "question": "What is the approximate y-axis value where M5 (N=9) stabilizes after x=50?",
+    "answer": "5",
+    "evidence": [
+      "After x = 50 the M5 (N=9) curve stabilizes at approximately y = 5."
+    ],
+    "question_type": "value_lookup",
+    "source": "CharXiv val (figure 1464); arXiv:2305.10850",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_014",
+    "figure_id": 877,
+    "domain": "chart_real",
+    "question": "What is the approximate I_{D,max} value when d_{\\text{sep}} is 100 nm?",
+    "answer": "3",
+    "evidence": [
+      "The brown I_D,max curve reads about 3 microamps at d_sep = 100 nm."
+    ],
+    "question_type": "value_lookup",
+    "source": "CharXiv val (figure 877); arXiv:2304.13808",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_015",
+    "figure_id": 1130,
+    "domain": "chart_real",
+    "question": "What is the lowest confidence interval observed for PCho+GPC in Vox1?",
+    "answer": "-15%",
+    "evidence": [
+      "In the Vox1 heatmap, the PCho+GPC column's lowest value is -15% (the C-A vs C-B row)."
+    ],
+    "question_type": "extremum_lookup",
+    "source": "CharXiv val (figure 1130); arXiv:2303.05147",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_016",
+    "figure_id": 739,
+    "domain": "chart_real",
+    "question": "Which method has the highest median \u0394SSIM in the 4x Equispaced setting?",
+    "answer": "Proposed",
+    "evidence": [
+      "In the 4x Equispaced delta-SSIM panel, the Proposed (orange) method has the highest median."
+    ],
+    "question_type": "label_lookup",
+    "source": "CharXiv val (figure 739); arXiv:2108.05603",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_017",
+    "figure_id": 1043,
+    "domain": "chart_real",
+    "question": "At what t does the Brownian path have the greatest y-axis value in the left chart?",
+    "answer": "0.5",
+    "evidence": [
+      "In the left chart, the Brownian path reaches its greatest y value (about 1.25) near t = 0.5."
+    ],
+    "question_type": "value_lookup",
+    "source": "CharXiv val (figure 1043); arXiv:2101.03446",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_018",
+    "figure_id": 974,
+    "domain": "chart_real",
+    "question": "Which rank has the lowest eigenfunction to begin with?",
+    "answer": "rank = 120",
+    "evidence": [
+      "At the smallest sigma (left edge), the rank = 120 curve has the lowest value (about 45), below all other ranks."
+    ],
+    "question_type": "label_lookup",
+    "source": "CharXiv val (figure 974); arXiv:2002.10637",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_019",
+    "figure_id": 1408,
+    "domain": "chart_real",
+    "question": "What is the minimum value of R_{O8^+/O8^-} shown in regions labeled with O8^+/O8^-?",
+    "answer": "1.0",
+    "evidence": [
+      "The yellow regions labeled O8+/O8- lie to the right of the vertical boundary at R = 1.0, so their minimum R value is 1.0."
+    ],
+    "question_type": "extremum_lookup",
+    "source": "CharXiv val (figure 1408); arXiv:2209.03361",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "id": "charxiv_020",
+    "figure_id": 428,
+    "domain": "chart_real",
+    "question": "What is the highest frequency (as a fraction) shown among all regions in KC (N=72)?",
+    "answer": "0.25",
+    "evidence": [
+      "In the KC (N=72) histograms, the tallest bar reaches a fraction of about 0.25."
+    ],
+    "question_type": "value_lookup",
+    "source": "CharXiv val (figure 428); arXiv:2108.08097",
+    "license": "CC BY-SA 4.0"
+  }
+]

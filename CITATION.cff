@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this project, please cite it as below."
+title: "DocVLM-Fingerprint: A Reusable Workflow for Document-Centric VLM Faithfulness Stress Testing"
+authors:
+  - family-names: Kukreja
+    given-names: Samarth
+version: 0.1.0
+date-released: 2026-07-04
+license: MIT
+

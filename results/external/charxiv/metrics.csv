@@ -1,0 +1,11 @@
+external_dataset,model,domain,perturbation,total_answers,correct_answers,answer_accuracy,total_claims,supported_claims,unsupported_claims,claim_faithfulness,hallucination_rate,perturbation_drop
+CharXiv,qwen3_vl_4b,chart_real,clean,20,8,0.4000,41,24,17,0.5854,0.4146,0.0000
+CharXiv,qwen3_vl_4b,chart_real,blur_downscale,20,3,0.1500,43,12,31,0.2791,0.7209,0.2500
+CharXiv,qwen3_vl_4b,chart_real,crop_removal,20,8,0.4000,43,25,18,0.5814,0.4186,0.0000
+CharXiv,qwen3_vl_4b,chart_real,jpeg_compression,20,2,0.1000,42,12,30,0.2857,0.7143,0.3000
+CharXiv,qwen3_vl_4b,chart_real,distractor_text,20,7,0.3500,42,24,18,0.5714,0.4286,0.0500
+CharXiv,qwen3_vl_8b,chart_real,clean,20,9,0.4500,40,25,15,0.6250,0.3750,0.0000
+CharXiv,qwen3_vl_8b,chart_real,blur_downscale,20,5,0.2500,42,13,29,0.3095,0.6905,0.2000
+CharXiv,qwen3_vl_8b,chart_real,crop_removal,20,8,0.4000,42,24,18,0.5714,0.4286,0.0500
+CharXiv,qwen3_vl_8b,chart_real,jpeg_compression,20,2,0.1000,42,12,30,0.2857,0.7143,0.3500
+CharXiv,qwen3_vl_8b,chart_real,distractor_text,20,10,0.5000,40,24,16,0.6000,0.4000,-0.0500

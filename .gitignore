@@ -1,0 +1,54 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+tests/.tmp/
+.coverage
+htmlcov/
+
+# Virtual environments and local env files
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+env/
+
+# Local/runtime caches
+kaggle/*.zip
+tmp/
+.cache/
+.streamlit/
+results/cache/
+
+# The first-party generated dataset is intentionally committed:
+# data/samples/ contains 120 clean synthetic images, and data/perturbed/
+# contains 480 deterministic variants used by the main reproducible run.
+# Third-party external image slices stay local unless their licenses are checked.
+!data/external/README.md
+!data/external/
+data/external/chartqa/
+data/external/documentvqa/
+data/external/charxiv/perturbed/
+data/external/charxiv/samples/
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+
+# Notebook/runtime noise
+.ipynb_checkpoints/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+
+

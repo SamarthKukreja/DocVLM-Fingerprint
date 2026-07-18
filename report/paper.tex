@@ -1,0 +1,288 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{longtable}
+\graphicspath{{report/figures/}{figures/}}
+
+\title{DocVLM-Fingerprint: Document VLM Faithfulness Under Visual Perturbations}
+\author{Samarth Kukreja}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+DocVLM-Fingerprint studies a narrow failure mode in document visual question answering: a model can return a plausible short answer while the claim behind that answer is not grounded in the image. I built a reproducible evaluation pipeline with generated chart, OCR document, and scientific figure tasks, four visual perturbations, open VLM clients, answer scoring, claim support labels, plots, and failure records. The main run covers 120 generated examples, 480 perturbed variants, and three open model entries. Small clean slices from ChartQA and DocumentVQA, plus a Qwen-only CharXiv real-chart perturbation supplement, are included as external checks. The evidence supports a controlled diagnostic study of failure patterns, not a general ranking of VLMs.
+\end{abstract}
+
+\section{Introduction}
+
+Most document VQA evaluations report whether the final answer is correct. That single number can hide two useful cases: a correct answer with an unsupported explanation, and an incorrect answer that still contains some grounded visual claims. DocVLM-Fingerprint keeps these cases visible by reporting answer accuracy beside claim support.
+
+The project is deliberately scoped as a systems and evaluation artifact. Its main output is the complete experiment path: task creation, perturbation generation, model evaluation, claim splitting, binary evidence scoring, metric aggregation, plotting, and failure analysis. Deterministic mock outputs keep the pipeline testable on a laptop, while the Kaggle run supplies the open model results used in the analysis.
+
+The main contributions are the implemented experiment pipeline, the generated perturbation suite, answer and claim support reporting with bootstrap confidence intervals, an audit-ready worksheet for failure inspection, small external checks on ChartQA, DocumentVQA, and CharXiv, and descriptive ablations for answer and claim disagreement.
+
+The name \emph{Fingerprint} refers to model weakness profiles under perturbation and faithfulness scoring. It does not refer to model ownership, identity verification, or watermark fingerprinting.
+
+\section{Related Work And Differentiation}
+
+The surrounding literature is already rich: multimodal evaluation toolkits, hallucination benchmarks, robustness suites, OCR and chart tasks, and claim based faithfulness measures all address parts of this problem. Examples include broad evaluation frameworks such as VLMEvalKit and lmms-eval~\cite{vlmevalkit,lmmseval}, hallucination work such as HallusionBench and POPE~\cite{hallusionbench,pope}, faithfulness work such as FaithScore~\cite{faithscore}, robustness suites such as VLM-RobustBench and OCR-Robust~\cite{vlmrobustbench,ocrrobust}, and task benchmarks such as CharXiv, ChartQA, PlotQA, and DocVQA~\cite{charxiv,chartqa,plotqa,docvqa}.
+
+This work is closest to an integration study. It puts a small document VQA experiment, fixed perturbations, open model clients, answer accuracy, grounded claim scoring, plots, readable failures, ablation tables, and external checks into one rerunnable package. The model comparisons are used to exercise the pipeline; the central contribution is the reproducible diagnostic setup.
+
+\section{Dataset}
+
+The generated dataset contains 120 examples across three document VQA domains. Each record stores an image path, question, short answer, direct evidence string, domain, and question type. The examples are controlled on purpose, so failures can be traced back to the visual evidence without relying on ambiguous ground truth.
+
+\begin{center}
+\begin{tabular}{lr}
+\hline
+\textbf{Domain} & \textbf{Examples} \\
+\hline
+Charts/tables & 40 \\
+OCR heavy documents & 40 \\
+Scientific figures/pages & 40 \\
+\hline
+Total & 120 \\
+\hline
+\end{tabular}
+\end{center}
+
+The chart subset contains bar charts, line charts, and table style visuals. The OCR subset uses receipts, forms, invoice style pages, and short policy pages. The scientific subset uses ablation tables, architecture diagrams, method comparison figures, and method notes. The generated set avoids private PDFs and copyrighted paper screenshots.
+
+\section{Visual Perturbations}
+
+For each example, the code creates four deterministic visual perturbations. They are simple input stress tests. I do not treat them as adversarial attacks or as probes of model internals.
+
+\begin{center}
+\begin{tabular}{ll}
+\hline
+\textbf{Perturbation} & \textbf{Purpose} \\
+\hline
+Blur/downscale & Reduced resolution and softened details \\
+Crop/removal & Partially missing visual evidence \\
+JPEG compression & Block artifacts and quantization artifacts \\
+Distractor text & Irrelevant overlaid text near evidence \\
+\hline
+\end{tabular}
+\end{center}
+
+The final generated run contains 480 perturbed variants, with 160 variants per domain. Metadata records the example ID, domain, perturbation type, severity, input path, and output path.
+
+\section{Claim Support Scoring}
+
+Answer accuracy can hide unsupported visual claims, so the analysis also reports claim support.
+
+The pipeline decomposes each model answer into atomic claims. Each claim is stored as structured JSON style data with a claim string and a small type field. The current implementation uses only factual and inference claim types.
+
+Each claim receives one binary label: supported or unsupported. The scorer first applies exact, numeric, and entity checks, then compares the claim against the written evidence field. A cached LLM judge can be enabled for inconclusive cases. In the reported run, the scorer is best understood as an auditable component of the evaluation pipeline rather than a new faithfulness metric.
+
+The reported metrics are answer accuracy, claim support, hallucination rate, and perturbation drop. Claim support is the fraction of scored claims labeled supported; hallucination rate is the fraction labeled unsupported. Perturbation drop is the clean metric minus the perturbed metric.
+
+\section{Experimental Setup}
+
+The checked in model run evaluates qwen3 vl 8b, internvl35 8b hf, and qwen3 vl 4b on 120 generated examples and four perturbations per example, for 600 cases per model and 1800 calls total. The set contains two independent model families plus a Qwen 4B and 8B size comparison. The deterministic mock path remains useful for local validation without GPU access, and external data is reported separately.
+
+\begin{center}
+\begin{tabular}{lrr}
+\hline
+\textbf{Domain} & \textbf{Clean examples} & \textbf{Perturbed variants} \\
+\hline
+chart & 40 & 160 \\
+ocr\_doc & 40 & 160 \\
+scientific\_figure & 40 & 160 \\
+\hline
+\end{tabular}
+\end{center}
+
+\section{Results}
+
+The generated evaluation set contains 120 clean examples across chart, OCR document, and scientific figure domains. The Kaggle run evaluates three model entries: internvl35 8b hf, qwen3 vl 4b, qwen3 vl 8b. Each model is run on the clean examples and all four perturbation variants. The parser recovered final answers for all 1800 calls; 1764 calls included explicit Evidence lines, with most noncompliant generations occurring on heavily degraded chart inputs.
+
+Answer accuracy can hide unsupported visual claims, so the analysis also reports claim support.
+
+\begin{center}
+\begin{tabular}{lrr}
+\hline
+\textbf{Domain} & \textbf{Clean examples} & \textbf{Perturbed variants} \\
+\hline
+chart & 40 & 160 \\
+ocr\_doc & 40 & 160 \\
+scientific\_figure & 40 & 160 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Main Metrics}
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{llllrrr}
+\hline
+\textbf{Model} & \textbf{Domain} & \textbf{Perturbation} & \textbf{N} & \textbf{Acc.} & \textbf{Faith.} & \textbf{Halluc.} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Model} & \textbf{Domain} & \textbf{Perturbation} & \textbf{N} & \textbf{Acc.} & \textbf{Faith.} & \textbf{Halluc.} \\
+\hline
+\endhead
+internvl35\_8b\_hf & chart & clean & 40 & 0.70 & 1.00 & 0.00 \\
+internvl35\_8b\_hf & chart & blur\_downscale & 40 & 0.10 & 0.15 & 0.85 \\
+internvl35\_8b\_hf & chart & crop\_removal & 40 & 0.53 & 0.88 & 0.12 \\
+internvl35\_8b\_hf & chart & jpeg\_compression & 40 & 0.03 & 0.10 & 0.90 \\
+internvl35\_8b\_hf & chart & distractor\_text & 40 & 0.65 & 0.90 & 0.10 \\
+internvl35\_8b\_hf & ocr\_doc & clean & 40 & 0.95 & 1.00 & 0.00 \\
+internvl35\_8b\_hf & ocr\_doc & blur\_downscale & 40 & 0.23 & 0.23 & 0.78 \\
+internvl35\_8b\_hf & ocr\_doc & crop\_removal & 40 & 0.62 & 0.68 & 0.33 \\
+internvl35\_8b\_hf & ocr\_doc & jpeg\_compression & 40 & 0.03 & 0.03 & 0.97 \\
+internvl35\_8b\_hf & ocr\_doc & distractor\_text & 40 & 0.82 & 0.85 & 0.15 \\
+internvl35\_8b\_hf & scientific\_figure & clean & 40 & 0.88 & 1.00 & 0.00 \\
+internvl35\_8b\_hf & scientific\_figure & blur\_downscale & 40 & 0.00 & 0.03 & 0.97 \\
+internvl35\_8b\_hf & scientific\_figure & crop\_removal & 40 & 0.60 & 0.78 & 0.23 \\
+internvl35\_8b\_hf & scientific\_figure & jpeg\_compression & 40 & 0.07 & 0.07 & 0.93 \\
+internvl35\_8b\_hf & scientific\_figure & distractor\_text & 40 & 0.88 & 1.00 & 0.00 \\
+qwen3\_vl\_4b & chart & clean & 40 & 0.95 & 0.97 & 0.03 \\
+qwen3\_vl\_4b & chart & blur\_downscale & 40 & 0.10 & 0.23 & 0.78 \\
+qwen3\_vl\_4b & chart & crop\_removal & 40 & 0.65 & 0.68 & 0.33 \\
+qwen3\_vl\_4b & chart & jpeg\_compression & 40 & 0.00 & 0.00 & 1.00 \\
+qwen3\_vl\_4b & chart & distractor\_text & 40 & 0.88 & 0.90 & 0.10 \\
+qwen3\_vl\_4b & ocr\_doc & clean & 40 & 0.90 & 0.90 & 0.10 \\
+qwen3\_vl\_4b & ocr\_doc & blur\_downscale & 40 & 0.30 & 0.32 & 0.68 \\
+qwen3\_vl\_4b & ocr\_doc & crop\_removal & 40 & 0.57 & 0.61 & 0.39 \\
+qwen3\_vl\_4b & ocr\_doc & jpeg\_compression & 40 & 0.00 & 0.00 & 1.00 \\
+qwen3\_vl\_4b & ocr\_doc & distractor\_text & 40 & 0.68 & 0.78 & 0.23 \\
+qwen3\_vl\_4b & scientific\_figure & clean & 40 & 0.93 & 1.00 & 0.00 \\
+qwen3\_vl\_4b & scientific\_figure & blur\_downscale & 40 & 0.00 & 0.00 & 1.00 \\
+qwen3\_vl\_4b & scientific\_figure & crop\_removal & 40 & 0.68 & 0.82 & 0.17 \\
+qwen3\_vl\_4b & scientific\_figure & jpeg\_compression & 40 & 0.00 & 0.00 & 1.00 \\
+qwen3\_vl\_4b & scientific\_figure & distractor\_text & 40 & 0.93 & 1.00 & 0.00 \\
+qwen3\_vl\_8b & chart & clean & 40 & 1.00 & 1.00 & 0.00 \\
+qwen3\_vl\_8b & chart & blur\_downscale & 40 & 0.12 & 0.30 & 0.70 \\
+qwen3\_vl\_8b & chart & crop\_removal & 40 & 0.82 & 0.85 & 0.15 \\
+qwen3\_vl\_8b & chart & jpeg\_compression & 40 & 0.00 & 0.05 & 0.95 \\
+qwen3\_vl\_8b & chart & distractor\_text & 40 & 0.93 & 0.95 & 0.05 \\
+qwen3\_vl\_8b & ocr\_doc & clean & 40 & 0.97 & 1.00 & 0.00 \\
+qwen3\_vl\_8b & ocr\_doc & blur\_downscale & 40 & 0.23 & 0.23 & 0.78 \\
+qwen3\_vl\_8b & ocr\_doc & crop\_removal & 40 & 0.57 & 0.65 & 0.35 \\
+qwen3\_vl\_8b & ocr\_doc & jpeg\_compression & 40 & 0.00 & 0.00 & 1.00 \\
+qwen3\_vl\_8b & ocr\_doc & distractor\_text & 40 & 0.85 & 0.90 & 0.10 \\
+qwen3\_vl\_8b & scientific\_figure & clean & 40 & 0.97 & 0.97 & 0.03 \\
+qwen3\_vl\_8b & scientific\_figure & blur\_downscale & 40 & 0.10 & 0.10 & 0.90 \\
+qwen3\_vl\_8b & scientific\_figure & crop\_removal & 40 & 0.65 & 0.78 & 0.23 \\
+qwen3\_vl\_8b & scientific\_figure & jpeg\_compression & 40 & 0.00 & 0.00 & 1.00 \\
+qwen3\_vl\_8b & scientific\_figure & distractor\_text & 40 & 0.95 & 0.95 & 0.05 \\
+\hline
+\end{longtable}
+\endgroup
+
+Bootstrap intervals use case level resampling within each perturbation and a fixed seed. The full table is written to results/metric\_cis\_by\_perturbation.csv.
+
+\begin{center}
+\begin{tabular}{lrrr}
+\hline
+\textbf{Perturbation} & \textbf{Acc. 95\% CI} & \textbf{Faith. 95\% CI} & \textbf{Halluc. 95\% CI} \\
+\hline
+clean & 0.89 to 0.94 & 0.97 to 0.99 & 0.01 to 0.03 \\
+blur\_downscale & 0.09 to 0.17 & 0.14 to 0.22 & 0.78 to 0.86 \\
+crop\_removal & 0.58 to 0.68 & 0.70 to 0.79 & 0.21 to 0.30 \\
+jpeg\_compression & 0.00 to 0.03 & 0.01 to 0.05 & 0.95 to 0.99 \\
+distractor\_text & 0.80 to 0.88 & 0.88 to 0.94 & 0.06 to 0.12 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Key Findings}
+
+Clean generated examples are mostly solved by the evaluated open VLMs. Average clean performance across the three domains is: internvl35 8b hf: 0.842 answer accuracy / 1.000 claim support; qwen3 vl 4b: 0.925 answer accuracy / 0.958 claim support; qwen3 vl 8b: 0.983 answer accuracy / 0.992 claim support.
+
+The strongest perturbation failures are jpeg compression with 0.014 answer accuracy, 0.028 claim support, and 0.972 hallucination rate; blur downscale with 0.131 answer accuracy, 0.175 claim support, and 0.825 hallucination rate. These values describe this run only; they should not be read as population guarantees.
+
+The other perturbations are milder in this run: crop removal averages 0.633 accuracy and 0.746 claim support; distractor text averages 0.839 accuracy and 0.914 claim support.
+
+\subsection{Clean Baseline}
+
+The clean rows provide the baseline across charts, OCR documents, and scientific figures. The models handle these controlled inputs well. That makes the perturbation drops easier to interpret: the large failures come from specific visual degradations, not from a task format that was already unsolved.
+
+\subsection{Perturbation Robustness}
+
+The perturbation rows compare each domain with its clean setting under the same four transformations. JPEG compression and blur/downscale produce the largest drops, often reducing strong clean performance to very low accuracy and claim support. Crop/removal causes moderate damage. Distractor text is less disruptive in this generated set. I report these as observed differences, not as causal estimates about model internals.
+
+\subsection{Accuracy vs. Claim Support}
+
+The scatter plot checks whether final answer correctness and claim support separate. The two-line answer and evidence protocol scores the final answer separately from the supporting visual claim. In this run, the strongest separation is not correct answers with unsupported evidence; it is 113 claim rows where the final answer is incorrect while the extracted evidence claim is still supported. This makes visible partial visual grounding that answer accuracy alone would hide.
+
+\subsection{Qwen Size Comparison}
+
+The run includes a Qwen3-VL size comparison. Average clean answer accuracy is 0.925 for qwen3 vl 4b and 0.983 for qwen3 vl 8b; average clean claim support is 0.958 and 0.992, respectively. This is useful for checking size sensitivity within one family, although it is not a third independent model family.
+
+\subsection{External Real Data Checks}
+
+The external data checks are kept separate from the generated set. A 30 example HuggingFaceM4/ChartQA slice evaluates clean chart question answering for all three model entries, giving 90 additional VLM calls under results/external/chartqa. Exact-match answer accuracies are 0.600 for qwen3 vl 8b, 0.200 for internvl35 8b hf, and 0.500 for qwen3 vl 4b. A 30 example HuggingFaceM4/DocumentVQA validation slice evaluates clean OCR document question answering for the same three model entries, giving 90 additional VLM calls under results/external/documentvqa. Answer accuracies are 0.667 for qwen3 vl 8b, 0.633 for internvl35 8b hf, and 0.633 for qwen3 vl 4b. A separate CharXiv supplement adds 20 real arXiv chart examples with the same four perturbations, evaluated for qwen3 vl 4b and qwen3 vl 8b only under results/external/charxiv. Clean CharXiv accuracy is 0.400 and 0.450, respectively; jpeg compression drops both to 0.100, and blur downscale reaches 0.150 and 0.250. CharXiv is the most direct external perturbation transfer check, while ChartQA and DocumentVQA are clean only. These external numbers are small checks; they are not merged with the generated perturbation study.
+
+\subsection{Descriptive Ablations}
+
+The ablation helper writes descriptive tables under results/ablations without additional VLM calls. The tables summarize answer and claim disagreement counts, scorer method usage by label, perturbation effect sizes, and no claim cases. They help interpret the run; they are not proposed as a new metric.
+
+\subsection{Failure Examples}
+
+\begin{enumerate}
+\item chart\_002 / chart / distractor\_text: question: Which category has the highest value?; answer: Answer: NYB
+Evidence: The bar labeled "NYB" is the tallest, with a value of 22, which is higher than the other categories.; claims: The bar labeled "NYB" is the tallest, with a value of 22, which is higher than the other categories.. Perturbed input produced unsupported claim text under the binary scorer.
+\item ocr\_001 / ocr\_doc / distractor\_text: question: What is the receipt total?; answer: Answer: 52
+Evidence: The receipt shows "TOTAL" with "52" highlighted in red, indicating it is the correct total.; claims: The receipt shows "TOTAL" with "52" highlighted in red, indicating it is the correct total.; The receipt shows "TOTAL" with the amount "52" highlighted in red.. Perturbed input produced unsupported claim text under the binary scorer.
+\item sci\_008 / scientific\_figure / distractor\_text: question: Which method has the highest accuracy?; answer: Answer: BASE
+Evidence: The BASE method shows the highest accuracy value of 76 in the table.; claims: The BASE method shows the highest accuracy value of 76 in the table.. Perturbed input produced unsupported claim text under the binary scorer.
+\end{enumerate}
+
+The generated plots are stored in results/figures and copied into report/figures for paper builds. Figure~\ref{fig:accuracy-heatmap} shows answer accuracy, Figure~\ref{fig:faithfulness-heatmap} shows claim support, Figure~\ref{fig:accuracy-faithfulness} compares the two metrics, and Figure~\ref{fig:perturbation-impact} summarizes average accuracy drop from clean inputs.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\linewidth]{accuracy_heatmap.png}
+\caption{Answer accuracy by model, domain, and perturbation.}
+\label{fig:accuracy-heatmap}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\linewidth]{faithfulness_heatmap.png}
+\caption{Claim support by model, domain, and perturbation.}
+\label{fig:faithfulness-heatmap}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\linewidth]{accuracy_vs_faithfulness.png}
+\caption{Relationship between answer accuracy and claim support.}
+\label{fig:accuracy-faithfulness}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\linewidth]{perturbation_impact.png}
+\caption{Average answer accuracy drop from the clean setting, grouped by perturbation and model entry.}
+\label{fig:perturbation-impact}
+\end{figure}
+
+\clearpage
+
+\section{Failure Analysis}
+
+The selected failure examples focus on unsupported claims found by the binary scorer. The manual audit worksheet is prepared for post-run review and should be summarized only after the rows are manually checked. The examples make these records easy to inspect: a chart distractor case where the model follows a distractor NYB label instead of HYB, an OCR receipt case where it reads 52 instead of 50, and a scientific figure case where it selects BASE instead of FULL. They are debugging examples, not a taxonomy of VLM failures.
+
+\section{Limitations}
+
+The study is intentionally small. The main run covers all three generated domains for 3 open model entries, but only two independent model families are represented because Qwen 4B and 8B form a size comparison. The generated data improves control and reproducibility, but it limits what can be concluded about real documents. Most questions are single-hop short-answer lookups, so answer accuracy and claim support move together more often than they would for long rationales. Some generations also failed to follow the requested Evidence line format, which is reported as a protocol-compliance limitation rather than hidden. The binary scorer is transparent and testable, although it can miss paraphrases or ambiguous visual evidence. The unsupported label means a claim is not entailed by the annotated evidence string, so hallucination rate is an upper bound on fabrication under this scorer. The ChartQA, DocumentVQA, and CharXiv slices add real data evidence, but they are small and separate from the generated perturbation study; CharXiv is also Qwen-only. The simulated JPEG perturbation can remove small text entirely, so near-zero scores should be read as a missing-information floor condition rather than calibrated compression robustness. Future work should add independent multi annotator review and more visual changes, including rotations, layout shifts, lighting variation, watermarks, and adversarial text.
+\section{Conclusion}
+
+DocVLM-Fingerprint provides a reproducible way to study document VLM behavior under visual perturbations. The current artifact includes 120 generated examples, four perturbations for every example, model client interfaces, claim support scoring, metrics, plots, failure examples, and a small inspection dashboard. Its value is practical: the same package can be rerun, audited, and extended with other models or datasets.
+
+\bibliographystyle{plain}
+\IfFileExists{report/references.bib}{\bibliography{report/references}}{\bibliography{references}}
+
+\end{document}
+
+
+

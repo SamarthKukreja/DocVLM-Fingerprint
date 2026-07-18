@@ -1,0 +1,96 @@
+# Config-driven model registry for DocVLM-Fingerprint.
+# Add a new model by implementing the shared client interface in src/vlm_clients.py
+# and adding a model entry here with a registered provider.
+models:
+  - name: mock
+    provider: mock
+    max_retries: 2
+  - name: openai_stub
+    provider: openai_stub
+    api_key_env: OPENAI_API_KEY
+    max_retries: 2
+
+  # Paper-facing Kaggle comparison: strong open VLM families at comparable 8B-9B scale.
+  - name: qwen3_vl_8b
+    provider: hf_chat_template
+    model_id: Qwen/Qwen3-VL-8B-Instruct
+    model_class: Qwen3VLForConditionalGeneration
+    image_content_key: image
+    load_in_4bit: false
+    torch_dtype: bfloat16
+    max_new_tokens: 96
+    max_retries: 1
+    prompt_suffix: Return exactly two lines: Answer: <short final answer only> and Evidence: <one concise sentence describing the visual evidence used>. Do not add extra lines.
+
+  - name: internvl35_8b_hf
+    provider: hf_chat_template
+    model_id: OpenGVLab/InternVL3_5-8B-HF
+    model_class: AutoModelForImageTextToText
+    image_content_key: image
+    load_in_4bit: false
+    torch_dtype: bfloat16
+    low_cpu_mem_usage: true
+    max_new_tokens: 96
+    max_retries: 1
+    prompt_suffix: Return exactly two lines: Answer: <short final answer only> and Evidence: <one concise sentence describing the visual evidence used>. Do not add extra lines.
+
+  - name: glm41v_9b_thinking
+    provider: hf_chat_template
+    model_id: zai-org/GLM-4.1V-9B-Thinking
+    model_class: Glm4vForConditionalGeneration
+    image_content_key: image
+    load_in_4bit: false
+    torch_dtype: bfloat16
+    max_new_tokens: 96
+    max_retries: 1
+    prompt_suffix: Return exactly two lines: Answer: <short final answer only> and Evidence: <one concise sentence describing the visual evidence used>. Do not add extra lines.
+
+  # Fallback and appendix models if Kaggle memory/runtime is tight.
+  - name: qwen3_vl_4b
+    provider: hf_chat_template
+    model_id: Qwen/Qwen3-VL-4B-Instruct
+    model_class: Qwen3VLForConditionalGeneration
+    image_content_key: image
+    load_in_4bit: false
+    torch_dtype: bfloat16
+    max_new_tokens: 96
+    max_retries: 1
+    prompt_suffix: Return exactly two lines: Answer: <short final answer only> and Evidence: <one concise sentence describing the visual evidence used>. Do not add extra lines.
+
+  - name: qwen25_vl_3b
+    provider: qwen25_vl
+    model_id: Qwen/Qwen2.5-VL-3B-Instruct
+    load_in_4bit: false
+    torch_dtype: bfloat16
+    max_new_tokens: 96
+    max_retries: 1
+    prompt_suffix: Return exactly two lines: Answer: <short final answer only> and Evidence: <one concise sentence describing the visual evidence used>. Do not add extra lines.
+
+  - name: smolvlm2_2b
+    provider: smolvlm
+    model_id: HuggingFaceTB/SmolVLM2-2.2B-Instruct
+    load_in_4bit: false
+    torch_dtype: bfloat16
+    max_new_tokens: 96
+    max_retries: 1
+    prompt_suffix: Return exactly two lines: Answer: <short final answer only> and Evidence: <one concise sentence describing the visual evidence used>. Do not add extra lines.
+
+  - name: internvl3_2b
+    provider: internvl3
+    model_id: OpenGVLab/InternVL3-2B
+    load_in_4bit: false
+    torch_dtype: bfloat16
+    input_size: 448
+    max_tiles: 4
+    max_new_tokens: 96
+    max_retries: 1
+    prompt_suffix: Return exactly two lines: Answer: <short final answer only> and Evidence: <one concise sentence describing the visual evidence used>. Do not add extra lines.
+
+  - name: llava15_7b
+    provider: llava_hf
+    model_id: llava-hf/llava-1.5-7b-hf
+    load_in_4bit: false
+    torch_dtype: bfloat16
+    max_new_tokens: 96
+    max_retries: 1
+    prompt_suffix: Return exactly two lines: Answer: <short final answer only> and Evidence: <one concise sentence describing the visual evidence used>. Do not add extra lines.
