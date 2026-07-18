@@ -171,7 +171,7 @@ h2 {
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 1px;
   transform: translateY(-44px);
   background: var(--line);

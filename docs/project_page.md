@@ -2,6 +2,8 @@
 
 HTML version: `docs/index.html` for GitHub Pages.
 
+Archived release: [10.5281/zenodo.21433621](https://doi.org/10.5281/zenodo.21433621); reported results correspond to `v1.0.0`.
+
 ## One-Line Summary
 
 DocVLM-Fingerprint is a reproducible evaluation workflow for testing how document-centric vision-language models behave under visual perturbations and claim-level faithfulness scoring.
@@ -10,13 +12,13 @@ DocVLM-Fingerprint is a reproducible evaluation workflow for testing how documen
 
 Vision-language models can look reliable on clean document images but fail sharply when images are compressed, blurred, cropped, or visually distracted. This project makes those failures inspectable by pairing answer accuracy with claim support labels, plots, and concrete failure examples.
 
-## What I Built
+## What It Includes
 
 - A deterministic generated dataset with 120 chart, OCR-document, and scientific-figure examples.
 - Four perturbation families for every example: blur/downscale, crop/removal, JPEG compression, and distractor text.
 - A plug-in model interface for local or API-backed VLM clients, with a custom-model config example for rerunning the pipeline on another model.
 - Claim extraction and binary evidence scoring with cacheable, auditable outputs.
-- Metrics, bootstrap confidence intervals, an audit-ready worksheet, descriptive ablation tables, heatmaps, failure examples, a Streamlit inspection dashboard, and a pdf report.
+- Metrics, bootstrap confidence intervals, an audit-ready worksheet, descriptive ablation tables, heatmaps, failure examples, a Streamlit inspection dashboard, and a LaTeX report.
 - A Kaggle notebook for running open VLMs on GPU and exporting reproducible result artifacts.
 - A small CharXiv real-chart perturbation supplement with local-only images that stays separate from the main generated-dataset metrics.
 
@@ -40,7 +42,7 @@ The main finding is intentionally narrow: the evaluated models perform strongly 
 - `results/external/chartqa/`: completed clean-only ChartQA sanity-check outputs
 - `results/external/documentvqa/`: completed clean-only DocumentVQA sanity-check outputs
 - `data/external/charxiv/` and `results/external/charxiv/`: curated real-chart perturbation supplement and Qwen-only outputs
-- `report/docvlm_fingerprint_paper.pdf`: concise paper-style report
+- `report/paper.tex`: concise paper-style report
 - `dashboard/app.py`: local inspection UI
 
 ## Engineering Signal
@@ -50,3 +52,9 @@ The project emphasizes maintainable ML evaluation infrastructure: deterministic 
 ## Limitations
 
 The main dataset is synthetic and small, the checked-in full run includes three model entries but only two independent model families, and the binary scorer is intentionally simple. These choices keep the project reproducible and auditable, but they limit broad claims. Bootstrap intervals are included as descriptive summaries. The ChartQA, DocumentVQA, and CharXiv runs are external checks rather than benchmark results, and CharXiv is Qwen-only. The 30-row manual-audit worksheet is prepared for review after a fresh run. Strong future extensions would add independent multi-annotator review, larger public real-world document slices, and more independent open-model families.
+
+
+
+## Code, Data, Ethics, And Licensing
+
+The code is MIT licensed and archived at [10.5281/zenodo.21433621](https://doi.org/10.5281/zenodo.21433621). The main generated dataset and perturbations are first-party project artifacts included for reproducibility. ChartQA, DocumentVQA, and CharXiv are external checks and remain separate from the main generated-dataset run. Third-party-derived images should remain local unless redistribution permissions are reviewed.

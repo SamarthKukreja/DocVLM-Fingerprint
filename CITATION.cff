@@ -4,7 +4,9 @@ title: "DocVLM-Fingerprint: A Reusable Workflow for Document-Centric VLM Faithfu
 authors:
   - family-names: Kukreja
     given-names: Samarth
-version: 0.1.0
-date-released: 2026-07-04
+version: 1.0.0
+date-released: 2026-07-19
+doi: 10.5281/zenodo.21433621
+url: "https://doi.org/10.5281/zenodo.21433621"
+repository-code: "https://github.com/SamarthKukreja/DocVLM-Fingerprint"
 license: MIT
-

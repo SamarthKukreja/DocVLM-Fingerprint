@@ -394,7 +394,7 @@ The clean rows provide the baseline across charts, OCR documents, and scientific
 
 \\subsection{{Perturbation Robustness}}
 
-The perturbation rows compare each domain with its clean setting under the same four transformations. JPEG compression and blur/downscale produce the largest drops, often reducing strong clean performance to very low accuracy and claim support. Crop/removal causes moderate damage. Distractor text is less disruptive in this generated set. I report these as observed differences, not as causal estimates about model internals.
+The perturbation rows compare each domain with its clean setting under the same four transformations. JPEG compression and blur/downscale produce the largest drops, often reducing strong clean performance to very low accuracy and claim support. Crop/removal causes moderate damage. Distractor text is less disruptive in this generated set. These differences are reported as observations, not as causal estimates about model internals.
 
 \\subsection{{Accuracy vs. Claim Support}}
 
@@ -406,7 +406,7 @@ The scatter plot checks whether final answer correctness and claim support separ
 
 \\subsection{{External Real Data Checks}}
 
-The external data checks are kept separate from the generated set. A 30 example HuggingFaceM4/ChartQA slice evaluates clean chart question answering for all three model entries, giving 90 additional VLM calls under results/external/chartqa. Exact-match answer accuracies are 0.600 for qwen3 vl 8b, 0.200 for internvl35 8b hf, and 0.500 for qwen3 vl 4b. A 30 example HuggingFaceM4/DocumentVQA validation slice evaluates clean OCR document question answering for the same three model entries, giving 90 additional VLM calls under results/external/documentvqa. Answer accuracies are 0.667 for qwen3 vl 8b, 0.633 for internvl35 8b hf, and 0.633 for qwen3 vl 4b. A separate CharXiv supplement adds 20 real arXiv chart examples with the same four perturbations, evaluated for qwen3 vl 4b and qwen3 vl 8b only under results/external/charxiv. Clean CharXiv accuracy is 0.400 and 0.450, respectively; jpeg compression drops both to 0.100, and blur downscale reaches 0.150 and 0.250. CharXiv is the most direct external perturbation transfer check, while ChartQA and DocumentVQA are clean only. These external numbers are small checks; they are not merged with the generated perturbation study.
+The external data checks are kept separate from the generated set. A 30 example HuggingFaceM4/ChartQA slice evaluates clean chart question answering for all three model entries, giving 90 additional VLM calls under results/external/chartqa. Exact-match answer accuracies are 0.600 for qwen3 vl 8b, 0.200 for internvl35 8b hf, and 0.500 for qwen3 vl 4b. A 30 example HuggingFaceM4/DocumentVQA validation slice evaluates clean OCR document question answering for the same three model entries, giving 90 additional VLM calls under results/external/documentvqa. Answer accuracies are 0.667 for qwen3 vl 8b, 0.633 for internvl35 8b hf, and 0.633 for qwen3 vl 4b. A separate CharXiv supplement records 20 real arXiv chart examples with the same four perturbations, evaluated for qwen3 vl 4b and qwen3 vl 8b only under results/external/charxiv. Clean CharXiv accuracy is 0.400 and 0.450, respectively; jpeg compression drops both to 0.100, and blur downscale reaches 0.150 and 0.250. CharXiv is the most direct external perturbation transfer check, with images kept local-only for public release, while ChartQA and DocumentVQA are clean only. These external numbers are small checks; they are not merged with the generated perturbation study.
 
 \\subsection{{Descriptive Ablations}}
 
@@ -420,28 +420,28 @@ The generated plots are stored in results/figures and copied into report/figures
 
 \\begin{{figure}}[htbp]
 \\centering
-\\includegraphics[width=0.95\\linewidth]{{accuracy_heatmap.png}}
+\\includegraphics[width=\\linewidth]{{accuracy_heatmap.png}}
 \\caption{{Answer accuracy by model, domain, and perturbation.}}
 \\label{{fig:accuracy-heatmap}}
 \\end{{figure}}
 
 \\begin{{figure}}[htbp]
 \\centering
-\\includegraphics[width=0.95\\linewidth]{{faithfulness_heatmap.png}}
+\\includegraphics[width=\\linewidth]{{faithfulness_heatmap.png}}
 \\caption{{Claim support by model, domain, and perturbation.}}
 \\label{{fig:faithfulness-heatmap}}
 \\end{{figure}}
 
 \\begin{{figure}}[htbp]
 \\centering
-\\includegraphics[width=0.8\\linewidth]{{accuracy_vs_faithfulness.png}}
+\\includegraphics[width=0.92\\linewidth]{{accuracy_vs_faithfulness.png}}
 \\caption{{Relationship between answer accuracy and claim support.}}
 \\label{{fig:accuracy-faithfulness}}
 \\end{{figure}}
 
 \\begin{{figure}}[htbp]
 \\centering
-\\includegraphics[width=0.9\\linewidth]{{perturbation_impact.png}}
+\\includegraphics[width=0.96\\linewidth]{{perturbation_impact.png}}
 \\caption{{Average answer accuracy drop from the clean setting, grouped by perturbation and model entry.}}
 \\label{{fig:perturbation-impact}}
 \\end{{figure}}
@@ -455,6 +455,18 @@ The selected failure examples focus on unsupported claims found by the binary sc
 \\section{{Limitations}}
 
 The study is intentionally small. The main run covers all three generated domains for {model_count_phrase(metric_rows)}, but only two independent model families are represented because Qwen 4B and 8B form a size comparison. The generated data improves control and reproducibility, but it limits what can be concluded about real documents. Most questions are single-hop short-answer lookups, so answer accuracy and claim support move together more often than they would for long rationales. Some generations also failed to follow the requested Evidence line format, which is reported as a protocol-compliance limitation rather than hidden. The binary scorer is transparent and testable, although it can miss paraphrases or ambiguous visual evidence. The unsupported label means a claim is not entailed by the annotated evidence string, so hallucination rate is an upper bound on fabrication under this scorer. The ChartQA, DocumentVQA, and CharXiv slices add real data evidence, but they are small and separate from the generated perturbation study; CharXiv is also Qwen-only. The simulated JPEG perturbation can remove small text entirely, so near-zero scores should be read as a missing-information floor condition rather than calibrated compression robustness. Future work should add independent multi annotator review and more visual changes, including rotations, layout shifts, lighting variation, watermarks, and adversarial text.
+
+\\section{{Code and Data Availability}}
+
+The project repository is available at \\url{{https://github.com/SamarthKukreja/DocVLM-Fingerprint}}. The archived release is available at \\url{{https://doi.org/10.5281/zenodo.21433621}}. The generated-dataset results in this report correspond to repository release v1.0.0. The main generated dataset, perturbation images, model outputs, metrics, confidence intervals, figures, ablation tables, report source, and tests are included in the repository so the reported artifacts can be inspected without rerunning VLM inference.
+
+External ChartQA, DocumentVQA, and CharXiv checks are reported separately from the main generated-dataset run. The repository does not redistribute third-party-derived external dataset images unless licensing permits it; those image folders are treated as local-only artifacts. The external result files and metadata are included only where they do not require redistribution of third-party image assets.
+
+\\section{{Ethics and Licensing}}
+
+The main dataset is generated by the project and is intended for controlled reliability analysis, not for measuring human ability or ranking deployed systems. The code is released under the MIT license. External datasets retain their original licenses and attribution requirements. Because ChartQA, DocumentVQA, and CharXiv include third-party data sources, their images should be downloaded or regenerated by users from authorized sources and should not be redistributed from this repository without a separate license review.
+
+The evaluation can surface unsupported visual claims, but the binary scorer is deliberately conservative and should not be used as a safety certification tool. Reported hallucination rates should be read as diagnostic upper bounds under the project scorer, not as definitive claims about real-world model behavior.
 """
     paper_path.write_text(text[:start] + replacement + text[end:], encoding="utf-8")
 
