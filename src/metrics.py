@@ -88,7 +88,9 @@ Color = tuple[int, int, int]
 
 def read_jsonl(path: Path, *, allow_empty: bool = False) -> list[dict[str, Any]]:
     if not path.exists():
-        raise FileNotFoundError(f"required input is missing: {path.relative_to(ROOT_DIR)}")
+        raise FileNotFoundError(
+            f"required input is missing: {path.relative_to(ROOT_DIR)}"
+        )
     records: list[dict[str, Any]] = []
     with path.open("r", encoding="utf-8") as handle:
         for line_number, line in enumerate(handle, start=1):
@@ -112,8 +114,12 @@ def perturbation_sort_key(name: str) -> tuple[int, str]:
     return PERTURBATION_ORDER.get(name, 100), name
 
 
-def aggregate_metrics(raw_outputs: list[dict[str, Any]], scored_outputs: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    raw_stats: dict[tuple[str, str, str], dict[str, int]] = defaultdict(lambda: {"total": 0, "correct": 0})
+def aggregate_metrics(
+    raw_outputs: list[dict[str, Any]], scored_outputs: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    raw_stats: dict[tuple[str, str, str], dict[str, int]] = defaultdict(
+        lambda: {"total": 0, "correct": 0}
+    )
     claim_stats: dict[tuple[str, str, str], dict[str, int]] = defaultdict(
         lambda: {"total": 0, "supported": 0, "unsupported": 0}
     )
@@ -138,7 +144,9 @@ def aggregate_metrics(raw_outputs: list[dict[str, Any]], scored_outputs: list[di
     }
 
     rows: list[dict[str, Any]] = []
-    for model, domain, perturbation in sorted(raw_stats, key=lambda item: (item[0], item[1], perturbation_sort_key(item[2]))):
+    for model, domain, perturbation in sorted(
+        raw_stats, key=lambda item: (item[0], item[1], perturbation_sort_key(item[2]))
+    ):
         raw = raw_stats[(model, domain, perturbation)]
         claims = claim_stats[(model, domain, perturbation)]
         answer_accuracy = safe_ratio(raw["correct"], raw["total"])
@@ -158,7 +166,9 @@ def aggregate_metrics(raw_outputs: list[dict[str, Any]], scored_outputs: list[di
                 "unsupported_claims": claims["unsupported"],
                 "claim_faithfulness": claim_faithfulness,
                 "hallucination_rate": hallucination_rate,
-                "perturbation_drop": 0.0 if perturbation == "clean" else baseline - answer_accuracy,
+                "perturbation_drop": 0.0
+                if perturbation == "clean"
+                else baseline - answer_accuracy,
             }
         )
     return rows
@@ -185,7 +195,12 @@ def write_metrics_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         writer.writeheader()
         for row in rows:
             output = dict(row)
-            for key in ("answer_accuracy", "claim_faithfulness", "hallucination_rate", "perturbation_drop"):
+            for key in (
+                "answer_accuracy",
+                "claim_faithfulness",
+                "hallucination_rate",
+                "perturbation_drop",
+            ):
                 output[key] = f"{float(output[key]):.4f}"
             writer.writerow(output)
 
@@ -271,7 +286,11 @@ def bootstrap_metric_cis(
         if not units:
             continue
         observed = _summarize_units(units)
-        draws = {"answer_accuracy": [], "claim_faithfulness": [], "hallucination_rate": []}
+        draws = {
+            "answer_accuracy": [],
+            "claim_faithfulness": [],
+            "hallucination_rate": [],
+        }
         for _ in range(resamples):
             sample = [units[rng.randrange(len(units))] for _ in range(len(units))]
             summary = _summarize_units(sample)
@@ -323,7 +342,9 @@ def write_metric_cis_csv(path: Path, rows: list[dict[str, Any]]) -> None:
 
 
 class Canvas:
-    def __init__(self, width: int, height: int, background: Color = (255, 255, 255)) -> None:
+    def __init__(
+        self, width: int, height: int, background: Color = (255, 255, 255)
+    ) -> None:
         self.width = width
         self.height = height
         self.rows = [bytearray(background * width) for _ in range(height)]
@@ -348,14 +369,18 @@ class Canvas:
             y = round(y1 + (y2 - y1) * t)
             self.pixel(x, y, color)
 
-    def text(self, x: int, y: int, text: str, color: Color = (30, 34, 39), scale: int = 2) -> None:
+    def text(
+        self, x: int, y: int, text: str, color: Color = (30, 34, 39), scale: int = 2
+    ) -> None:
         cursor = x
         for char in text.upper():
             glyph = FONT.get(char, FONT[" "])
             for gy, line in enumerate(glyph):
                 for gx, bit in enumerate(line):
                     if bit == "1":
-                        self.rect(cursor + gx * scale, y + gy * scale, scale, scale, color)
+                        self.rect(
+                            cursor + gx * scale, y + gy * scale, scale, scale, color
+                        )
             cursor += (max(len(line) for line in glyph) + 1) * scale
 
     def save(self, path: Path) -> None:
@@ -363,13 +388,20 @@ class Canvas:
 
         def chunk(kind: bytes, chunk_data: bytes) -> bytes:
             payload = kind + chunk_data
-            return struct.pack(">I", len(chunk_data)) + payload + struct.pack(">I", zlib.crc32(payload) & 0xFFFFFFFF)
+            return (
+                struct.pack(">I", len(chunk_data))
+                + payload
+                + struct.pack(">I", zlib.crc32(payload) & 0xFFFFFFFF)
+            )
 
         raw = b"".join(b"\x00" + bytes(row) for row in self.rows)
         data = b"".join(
             [
                 b"\x89PNG\r\n\x1a\n",
-                chunk(b"IHDR", struct.pack(">IIBBBBB", self.width, self.height, 8, 2, 0, 0, 0)),
+                chunk(
+                    b"IHDR",
+                    struct.pack(">IIBBBBB", self.width, self.height, 8, 2, 0, 0, 0),
+                ),
                 chunk(b"IDAT", zlib.compress(raw, 9)),
                 chunk(b"IEND", b""),
             ]
@@ -387,11 +419,17 @@ def metric_color(value: float | None) -> Color:
     return red, green, blue
 
 
-def draw_heatmap(rows: list[dict[str, Any]], metric_name: str, title: str, path: Path) -> None:
+def draw_heatmap(
+    rows: list[dict[str, Any]], metric_name: str, title: str, path: Path
+) -> None:
     row_labels = sorted({f"{row['model']}:{row['domain']}" for row in rows})
-    perturbations = sorted({str(row["perturbation"]) for row in rows}, key=perturbation_sort_key)
+    perturbations = sorted(
+        {str(row["perturbation"]) for row in rows}, key=perturbation_sort_key
+    )
     values = {
-        (f"{row['model']}:{row['domain']}", str(row["perturbation"])): float(row[metric_name])
+        (f"{row['model']}:{row['domain']}", str(row["perturbation"])): float(
+            row[metric_name]
+        )
         for row in rows
     }
 
@@ -413,7 +451,9 @@ def draw_heatmap(rows: list[dict[str, Any]], metric_name: str, title: str, path:
             x = left + col * cell_width
             value = values.get((row_label, perturbation))
             canvas.rect(x, y, cell_width - 4, cell_height - 4, metric_color(value))
-            canvas.text(x + 42, y + 18, "NA" if value is None else f"{value:.2f}", scale=2)
+            canvas.text(
+                x + 42, y + 18, "NA" if value is None else f"{value:.2f}", scale=2
+            )
     canvas.save(path)
 
 
@@ -426,6 +466,373 @@ def point_color(perturbation: str) -> Color:
         "distractor_text": (26, 152, 80),
     }
     return palette.get(perturbation, (80, 80, 80))
+
+
+def _pillow_font(size: int, *, bold: bool = False) -> Any:
+    from PIL import ImageFont
+
+    candidates = []
+    if bold:
+        candidates.extend(
+            [
+                r"C:\Windows\Fonts\arialbd.ttf",
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+                "/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf",
+            ]
+        )
+    candidates.extend(
+        [
+            r"C:\Windows\Fonts\arial.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf",
+        ]
+    )
+    for candidate in candidates:
+        if Path(candidate).exists():
+            return ImageFont.truetype(candidate, size=size)
+    return ImageFont.load_default()
+
+
+def _text_size(draw: Any, text: str, font: Any) -> tuple[int, int]:
+    box = draw.textbbox((0, 0), text, font=font)
+    return box[2] - box[0], box[3] - box[1]
+
+
+def _draw_centered(
+    draw: Any, box: tuple[int, int, int, int], text: str, font: Any, fill: Color
+) -> None:
+    x0, y0, x1, y1 = box
+    width, height = _text_size(draw, text, font)
+    draw.text(
+        (x0 + (x1 - x0 - width) / 2, y0 + (y1 - y0 - height) / 2),
+        text,
+        font=font,
+        fill=fill,
+    )
+
+
+def _draw_multiline_centered(
+    draw: Any,
+    box: tuple[int, int, int, int],
+    text: str,
+    font: Any,
+    fill: Color,
+    spacing: int = 4,
+) -> None:
+    x0, y0, x1, y1 = box
+    lines = text.split("\n")
+    sizes = [_text_size(draw, line, font) for line in lines]
+    total_height = sum(height for _, height in sizes) + spacing * max(0, len(lines) - 1)
+    y = y0 + (y1 - y0 - total_height) / 2
+    for line, (width, height) in zip(lines, sizes):
+        draw.text((x0 + (x1 - x0 - width) / 2, y), line, font=font, fill=fill)
+        y += height + spacing
+
+
+def _readable_value_color(color: Color) -> Color:
+    red, green, blue = color
+    luminance = 0.299 * red + 0.587 * green + 0.114 * blue
+    return (255, 255, 255) if luminance < 125 else (24, 30, 36)
+
+
+def _pretty_label(value: str) -> str:
+    return value.replace("_", " ")
+
+
+def _save_pillow(image: Any, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    image.save(path, format="PNG", optimize=True, dpi=(300, 300))
+
+
+def _draw_heatmap_pillow(
+    rows: list[dict[str, Any]], metric_name: str, title: str, path: Path
+) -> None:
+    from PIL import Image, ImageDraw
+
+    row_pairs = sorted({(str(row["model"]), str(row["domain"])) for row in rows})
+    perturbations = sorted(
+        {str(row["perturbation"]) for row in rows}, key=perturbation_sort_key
+    )
+    values = {
+        (str(row["model"]), str(row["domain"]), str(row["perturbation"])): float(
+            row[metric_name]
+        )
+        for row in rows
+    }
+
+    cell_width = 250
+    cell_height = 92
+    left = 440
+    top = 210
+    width = left + cell_width * max(1, len(perturbations)) + 100
+    height = top + cell_height * max(1, len(row_pairs)) + 105
+    image = Image.new("RGB", (width, height), (255, 255, 255))
+    draw = ImageDraw.Draw(image)
+
+    title_font = _pillow_font(46, bold=True)
+    label_font = _pillow_font(24, bold=True)
+    small_font = _pillow_font(22)
+    value_font = _pillow_font(30, bold=True)
+    axis_color = (45, 52, 60)
+    grid_color = (220, 224, 229)
+
+    draw.text((44, 36), title.title(), font=title_font, fill=axis_color)
+    draw.text(
+        (44, 105),
+        "Rows are model/domain pairs; cells show aggregated metric values.",
+        font=small_font,
+        fill=(95, 103, 112),
+    )
+
+    for col, perturbation in enumerate(perturbations):
+        x0 = left + col * cell_width
+        label = _pretty_label(perturbation).title().replace(" ", "\n")
+        _draw_multiline_centered(
+            draw,
+            (x0 + 4, 135, x0 + cell_width - 8, top - 18),
+            label,
+            small_font,
+            axis_color,
+        )
+
+    for row_index, (model, domain) in enumerate(row_pairs):
+        y0 = top + row_index * cell_height
+        y1 = y0 + cell_height - 8
+        row_label = f"{model}\n{domain}"
+        _draw_multiline_centered(
+            draw, (34, y0, left - 34, y1), row_label, small_font, axis_color
+        )
+        for col, perturbation in enumerate(perturbations):
+            x0 = left + col * cell_width
+            x1 = x0 + cell_width - 10
+            value = values.get((model, domain, perturbation))
+            color = metric_color(value)
+            draw.rounded_rectangle((x0, y0, x1, y1), radius=12, fill=color)
+            draw.rounded_rectangle(
+                (x0, y0, x1, y1), radius=12, outline=(255, 255, 255), width=3
+            )
+            _draw_centered(
+                draw,
+                (x0, y0, x1, y1),
+                "NA" if value is None else f"{value:.2f}",
+                value_font,
+                _readable_value_color(color),
+            )
+
+    draw.line(
+        (left, top - 4, left + cell_width * len(perturbations), top - 4),
+        fill=grid_color,
+        width=2,
+    )
+    _save_pillow(image, path)
+
+
+def _draw_scatter_pillow(rows: list[dict[str, Any]], path: Path) -> None:
+    from PIL import Image, ImageDraw
+
+    width, height = 1800, 1280
+    left, right = 205, 1320
+    top, bottom = 190, 1030
+    image = Image.new("RGB", (width, height), (255, 255, 255))
+    draw = ImageDraw.Draw(image)
+    title_font = _pillow_font(46, bold=True)
+    label_font = _pillow_font(28, bold=True)
+    small_font = _pillow_font(23)
+    tick_font = _pillow_font(22)
+    axis_color = (45, 52, 60)
+    grid_color = (222, 226, 231)
+
+    draw.text(
+        (70, 40), "Answer Accuracy vs. Claim Support", font=title_font, fill=axis_color
+    )
+    draw.text(
+        (70, 105),
+        "Each point is a model/domain/perturbation aggregate.",
+        font=small_font,
+        fill=(95, 103, 112),
+    )
+
+    for tick in range(6):
+        value = tick / 5
+        x = left + round((right - left) * value)
+        y = bottom - round((bottom - top) * value)
+        draw.line((x, top, x, bottom), fill=grid_color, width=2)
+        draw.line((left, y, right, y), fill=grid_color, width=2)
+        _draw_centered(
+            draw,
+            (x - 42, bottom + 18, x + 42, bottom + 54),
+            f"{value:.1f}",
+            tick_font,
+            axis_color,
+        )
+        _draw_centered(
+            draw,
+            (left - 86, y - 18, left - 18, y + 18),
+            f"{value:.1f}",
+            tick_font,
+            axis_color,
+        )
+
+    draw.line((left, bottom, right, bottom), fill=axis_color, width=4)
+    draw.line((left, bottom, left, top), fill=axis_color, width=4)
+    _draw_centered(
+        draw, (left, 1090, right, 1132), "Answer Accuracy", label_font, axis_color
+    )
+    draw.text((40, 130), "Claim Support", font=label_font, fill=axis_color)
+
+    for row in rows:
+        x_value = max(0.0, min(1.0, float(row["answer_accuracy"])))
+        y_value = max(0.0, min(1.0, float(row["claim_faithfulness"])))
+        x = left + round((right - left) * x_value)
+        y = bottom - round((bottom - top) * y_value)
+        color = point_color(str(row["perturbation"]))
+        draw.ellipse(
+            (x - 13, y - 13, x + 13, y + 13),
+            fill=color,
+            outline=(255, 255, 255),
+            width=3,
+        )
+
+    legend_x, legend_y = 1410, 210
+    draw.text(
+        (legend_x, legend_y - 65), "Perturbation", font=label_font, fill=axis_color
+    )
+    for index, perturbation in enumerate(
+        sorted({str(row["perturbation"]) for row in rows}, key=perturbation_sort_key)
+    ):
+        y = legend_y + index * 58
+        color = point_color(perturbation)
+        draw.ellipse((legend_x, y, legend_x + 26, y + 26), fill=color)
+        draw.text(
+            (legend_x + 42, y - 3),
+            _pretty_label(perturbation).title(),
+            font=small_font,
+            fill=axis_color,
+        )
+
+    _save_pillow(image, path)
+
+
+def _draw_perturbation_impact_pillow(rows: list[dict[str, Any]], path: Path) -> None:
+    from PIL import Image, ImageDraw
+
+    models = sorted({str(row["model"]) for row in rows})
+    perturbations = [
+        item
+        for item in sorted(
+            {str(row["perturbation"]) for row in rows}, key=perturbation_sort_key
+        )
+        if item != "clean"
+    ]
+    drops_by_model_perturbation: dict[tuple[str, str], list[float]] = defaultdict(list)
+    for row in rows:
+        perturbation = str(row["perturbation"])
+        if perturbation == "clean":
+            continue
+        drops_by_model_perturbation[(str(row["model"]), perturbation)].append(
+            float(row["perturbation_drop"])
+        )
+    average_drop = {
+        key: sum(values) / len(values)
+        for key, values in drops_by_model_perturbation.items()
+        if values
+    }
+    max_drop = max([0.1, *(max(0.0, value) for value in average_drop.values())])
+    y_max = min(1.0, max(0.25, math.ceil(max_drop * 10) / 10))
+
+    width, height = 1900, 1260
+    left, right = 170, 1415
+    top, bottom = 210, 975
+    image = Image.new("RGB", (width, height), (255, 255, 255))
+    draw = ImageDraw.Draw(image)
+    title_font = _pillow_font(46, bold=True)
+    label_font = _pillow_font(28, bold=True)
+    small_font = _pillow_font(23)
+    tick_font = _pillow_font(21)
+    axis_color = (45, 52, 60)
+    grid_color = (222, 226, 231)
+    palette = [(44, 123, 182), (26, 152, 80), (215, 48, 39), (116, 173, 209)]
+
+    draw.text((70, 40), "Perturbation Impact", font=title_font, fill=axis_color)
+    draw.text(
+        (70, 105),
+        "Average answer-accuracy drop from each model's clean setting.",
+        font=small_font,
+        fill=(95, 103, 112),
+    )
+
+    for tick in range(6):
+        value = y_max * tick / 5
+        y = bottom - round((bottom - top) * value / y_max)
+        draw.line((left, y, right, y), fill=grid_color, width=2)
+        _draw_centered(
+            draw, (48, y - 18, left - 18, y + 18), f"{value:.1f}", tick_font, axis_color
+        )
+
+    draw.line((left, bottom, right, bottom), fill=axis_color, width=4)
+    draw.line((left, bottom, left, top), fill=axis_color, width=4)
+    draw.text((42, 164), "Accuracy Drop", font=label_font, fill=axis_color)
+
+    group_width = (right - left) / max(1, len(perturbations))
+    bar_width = min(70, max(42, int((group_width - 72) / max(1, len(models)))))
+    for group_index, perturbation in enumerate(perturbations):
+        group_x = left + group_index * group_width
+        _draw_multiline_centered(
+            draw,
+            (
+                round(group_x),
+                bottom + 26,
+                round(group_x + group_width - 16),
+                bottom + 112,
+            ),
+            _pretty_label(perturbation).title().replace(" ", "\n"),
+            small_font,
+            axis_color,
+        )
+        for model_index, model in enumerate(models):
+            value = max(0.0, average_drop.get((model, perturbation), 0.0))
+            bar_height = round((bottom - top) * value / y_max) if y_max else 0
+            x0 = round(group_x + 36 + model_index * (bar_width + 16))
+            y0 = bottom - bar_height
+            color = palette[model_index % len(palette)]
+            draw.rounded_rectangle(
+                (x0, y0, x0 + bar_width, bottom), radius=8, fill=color
+            )
+            _draw_centered(
+                draw,
+                (x0 - 18, y0 - 42, x0 + bar_width + 18, y0 - 8),
+                f"{value:.2f}",
+                tick_font,
+                axis_color,
+            )
+
+    legend_x, legend_y = 1490, 230
+    draw.text((legend_x, legend_y - 70), "Model", font=label_font, fill=axis_color)
+    for index, model in enumerate(models):
+        y = legend_y + index * 62
+        color = palette[index % len(palette)]
+        draw.rounded_rectangle(
+            (legend_x, y, legend_x + 34, y + 24), radius=5, fill=color
+        )
+        draw.text((legend_x + 50, y - 2), model, font=small_font, fill=axis_color)
+
+    _save_pillow(image, path)
+
+
+def draw_pillow_plots(rows: list[dict[str, Any]]) -> bool:
+    try:
+        import PIL  # noqa: F401
+    except Exception:
+        return False
+    _draw_heatmap_pillow(
+        rows, "answer_accuracy", "Answer Accuracy", ACCURACY_HEATMAP_PATH
+    )
+    _draw_heatmap_pillow(
+        rows, "claim_faithfulness", "Claim Support", FAITHFULNESS_HEATMAP_PATH
+    )
+    _draw_scatter_pillow(rows, SCATTER_PATH)
+    _draw_perturbation_impact_pillow(rows, PERTURBATION_IMPACT_PATH)
+    return True
 
 
 def draw_scatter(rows: list[dict[str, Any]], path: Path) -> None:
@@ -462,7 +869,9 @@ def draw_scatter(rows: list[dict[str, Any]], path: Path) -> None:
 
     legend_x = 610
     legend_y = 94
-    for index, perturbation in enumerate(sorted({str(row["perturbation"]) for row in rows}, key=perturbation_sort_key)):
+    for index, perturbation in enumerate(
+        sorted({str(row["perturbation"]) for row in rows}, key=perturbation_sort_key)
+    ):
         y = legend_y + index * 24
         canvas.rect(legend_x, y, 12, 12, point_color(perturbation))
         canvas.text(legend_x + 20, y - 1, perturbation[:18], scale=1)
@@ -472,14 +881,20 @@ def draw_scatter(rows: list[dict[str, Any]], path: Path) -> None:
 def draw_perturbation_impact(rows: list[dict[str, Any]], path: Path) -> None:
     models = sorted({str(row["model"]) for row in rows})
     perturbations = [
-        item for item in sorted({str(row["perturbation"]) for row in rows}, key=perturbation_sort_key) if item != "clean"
+        item
+        for item in sorted(
+            {str(row["perturbation"]) for row in rows}, key=perturbation_sort_key
+        )
+        if item != "clean"
     ]
     drops_by_model_perturbation: dict[tuple[str, str], list[float]] = defaultdict(list)
     for row in rows:
         perturbation = str(row["perturbation"])
         if perturbation == "clean":
             continue
-        drops_by_model_perturbation[(str(row["model"]), perturbation)].append(float(row["perturbation_drop"]))
+        drops_by_model_perturbation[(str(row["model"]), perturbation)].append(
+            float(row["perturbation_drop"])
+        )
 
     average_drop = {
         key: sum(values) / len(values)
@@ -519,7 +934,9 @@ def draw_perturbation_impact(rows: list[dict[str, Any]], path: Path) -> None:
             bar_height = round((bottom - top) * value / y_max) if y_max else 0
             x = group_x + 18 + model_index * (bar_width + 8)
             y = bottom - bar_height
-            canvas.rect(x, y, bar_width, bar_height, palette[model_index % len(palette)])
+            canvas.rect(
+                x, y, bar_width, bar_height, palette[model_index % len(palette)]
+            )
             canvas.text(x - 2, max(top, y - 18), f"{value:.2f}", scale=1)
 
     legend_x = 610
@@ -533,8 +950,12 @@ def draw_perturbation_impact(rows: list[dict[str, Any]], path: Path) -> None:
 
 
 def generate_plots(rows: list[dict[str, Any]]) -> None:
+    if draw_pillow_plots(rows):
+        return
     draw_heatmap(rows, "answer_accuracy", "ANSWER ACCURACY", ACCURACY_HEATMAP_PATH)
-    draw_heatmap(rows, "claim_faithfulness", "CLAIM FAITHFULNESS", FAITHFULNESS_HEATMAP_PATH)
+    draw_heatmap(
+        rows, "claim_faithfulness", "CLAIM FAITHFULNESS", FAITHFULNESS_HEATMAP_PATH
+    )
     draw_scatter(rows, SCATTER_PATH)
     draw_perturbation_impact(rows, PERTURBATION_IMPACT_PATH)
 
@@ -553,17 +974,18 @@ def main() -> int:
     failure_examples = write_failure_examples(scored_outputs)
     update_paper_results(rows, failure_examples, ci_rows)
     print(f"wrote {len(rows)} metric rows to {METRICS_PATH.relative_to(ROOT_DIR)}")
-    print(f"wrote {len(ci_rows)} confidence-interval rows to {METRIC_CIS_PATH.relative_to(ROOT_DIR)}")
+    print(
+        f"wrote {len(ci_rows)} confidence-interval rows to {METRIC_CIS_PATH.relative_to(ROOT_DIR)}"
+    )
     print(f"wrote {ACCURACY_HEATMAP_PATH.relative_to(ROOT_DIR)}")
     print(f"wrote {FAITHFULNESS_HEATMAP_PATH.relative_to(ROOT_DIR)}")
     print(f"wrote {SCATTER_PATH.relative_to(ROOT_DIR)}")
     print(f"wrote {PERTURBATION_IMPACT_PATH.relative_to(ROOT_DIR)}")
-    print(f"wrote {len(failure_examples)} failure examples to {FAILURE_EXAMPLES_PATH.relative_to(ROOT_DIR)}")
+    print(
+        f"wrote {len(failure_examples)} failure examples to {FAILURE_EXAMPLES_PATH.relative_to(ROOT_DIR)}"
+    )
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-
-

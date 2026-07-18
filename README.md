@@ -30,7 +30,7 @@ The name `Fingerprint` refers to failure-mode and faithfulness fingerprints: com
 ## Quick Links For Reviewers
 
 - Project page: `docs/project_page.md`
-- Paper source: `report/paper.tex`
+- Paper : `report/docvlm_fingerprint_paper.pdf`
 - Metrics: `results/metrics.csv`
 - Bootstrap CIs: `results/metric_cis_by_perturbation.csv`
 - Manual audit worksheet: `docs/manual_audit.md`; summary helper writes `docs/manual_audit_summary.md` after review
@@ -38,12 +38,10 @@ The name `Fingerprint` refers to failure-mode and faithfulness fingerprints: com
 - External data importer/evaluator: `src/import_chartqa_slice.py`, `src/evaluate_external_chartqa.py`
 - Custom model config example: `configs/custom_model.example.yaml`
 - CharXiv real-chart supplement: `data/external/charxiv/`, `results/external/charxiv/`
-- Plots: `results/figures/` and `report/figures/`
 - Failure examples: `results/failure_examples.jsonl`
 - Ablations: `results/ablations/`
 - Kaggle GPU notebook: `kaggle/docvlm_fingerprint_open_vlm_case_study.ipynb`
 - Dashboard: `dashboard/app.py`
-
 
 ## Current Artifact
 
@@ -68,18 +66,18 @@ The name `Fingerprint` refers to failure-mode and faithfulness fingerprints: com
 
 The checked-in run is a real open-VLM evaluation from Kaggle. It evaluates three model entries, `qwen3_vl_8b`, `internvl35_8b_hf`, and `qwen3_vl_4b`, over the full generated dataset: 120 clean examples plus four perturbations per example, for 600 cases per model and 1800 VLM calls total. This gives two independent model families plus a Qwen 4B/8B scale-family comparison, supporting a controlled systems/evaluation case study rather than a general-purpose VLM benchmark. The full run uses a two-line `Answer:`/`Evidence:` protocol, shows high clean performance, and shows severe degradation under JPEG compression and blur/downscale. The parser recovered final answers for all 1800 calls; 1764 calls included explicit `Evidence:` lines.
 
-| Model | Domain | Perturbation | Answer accuracy | Claim faithfulness | Hallucination rate |
-| --- | --- | --- | ---: | ---: | ---: |
-| qwen3_vl_8b | chart | clean | 1.0000 | 1.0000 | 0.0000 |
-| qwen3_vl_8b | chart | jpeg_compression | 0.0000 | 0.0500 | 0.9500 |
-| qwen3_vl_8b | ocr_doc | clean | 0.9750 | 1.0000 | 0.0000 |
-| qwen3_vl_8b | scientific_figure | clean | 0.9750 | 0.9750 | 0.0250 |
-| internvl35_8b_hf | chart | clean | 0.7000 | 1.0000 | 0.0000 |
-| internvl35_8b_hf | chart | jpeg_compression | 0.0250 | 0.1000 | 0.9000 |
-| internvl35_8b_hf | ocr_doc | clean | 0.9500 | 1.0000 | 0.0000 |
-| internvl35_8b_hf | scientific_figure | clean | 0.8750 | 1.0000 | 0.0000 |
-| qwen3_vl_4b | chart | clean | 0.9500 | 0.9750 | 0.0250 |
-| qwen3_vl_4b | chart | jpeg_compression | 0.0000 | 0.0000 | 1.0000 |
+| Model            | Domain            | Perturbation     | Answer accuracy | Claim faithfulness | Hallucination rate |
+| ---------------- | ----------------- | ---------------- | --------------: | -----------------: | -----------------: |
+| qwen3_vl_8b      | chart             | clean            |          1.0000 |             1.0000 |             0.0000 |
+| qwen3_vl_8b      | chart             | jpeg_compression |          0.0000 |             0.0500 |             0.9500 |
+| qwen3_vl_8b      | ocr_doc           | clean            |          0.9750 |             1.0000 |             0.0000 |
+| qwen3_vl_8b      | scientific_figure | clean            |          0.9750 |             0.9750 |             0.0250 |
+| internvl35_8b_hf | chart             | clean            |          0.7000 |             1.0000 |             0.0000 |
+| internvl35_8b_hf | chart             | jpeg_compression |          0.0250 |             0.1000 |             0.9000 |
+| internvl35_8b_hf | ocr_doc           | clean            |          0.9500 |             1.0000 |             0.0000 |
+| internvl35_8b_hf | scientific_figure | clean            |          0.8750 |             1.0000 |             0.0000 |
+| qwen3_vl_4b      | chart             | clean            |          0.9500 |             0.9750 |             0.0250 |
+| qwen3_vl_4b      | chart             | jpeg_compression |          0.0000 |             0.0000 |             1.0000 |
 
 Full real-VLM metrics are in `results/metrics.csv`; perturbation-level bootstrap confidence intervals are in `results/metric_cis_by_perturbation.csv`. The ablation table records 113 claim rows where the final answer is incorrect but the evidence claim is supported, showing why answer accuracy and evidence support are worth tracking separately.
 
@@ -215,6 +213,3 @@ These limitations are intentional scope boundaries rather than hidden claims; th
 - No model training or fine-tuning is performed; the contribution is evaluation infrastructure and analysis.
 
 Recommended next improvements: polish the final PDF/project page, keep external-result claims clearly separated from the main generated run, and consider a larger independently reviewed audit only if time remains.
-
-
-
